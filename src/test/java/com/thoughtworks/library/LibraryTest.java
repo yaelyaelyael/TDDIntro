@@ -2,96 +2,96 @@ package com.thoughtworks.library;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.List;
 
 import static org.mockito.Matchers.contains;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class LibraryTest {
+    private ArrayList<String> books;
+    private PrintStream printStream;
+    private DateTime time;
+    private DateTimeFormatter dateTimeFormatter;
+    private Library libraryWithDateTimeFormatter;
+    private Library library;
 
 
-    /*
-
-        List books tests. Implement the first three tests for the Verify exercise
-
-     */
-
+    @Before
+    public void setUp() throws Exception {
+        books = new ArrayList<>();
+        printStream = mock(PrintStream.class);
+        time = new DateTime();
+        dateTimeFormatter = mock(DateTimeFormatter.class);
+        library = new Library(books, printStream, null);
+        libraryWithDateTimeFormatter = new Library(books, printStream, dateTimeFormatter);
+    }
 
     @Test
     public void shouldPrintBookTitleWhenThereIsOneBook() {
 
-        List<String> books = new ArrayList<>();
         String title = "Book Title";
         books.add(title);
-        PrintStream printStream = mock(PrintStream.class);
-        Library library = new Library(books, printStream, null);
-
         library.listBooks();
 
-        // add a verify statement here that shows that the book title was printed by to the printStream
+        verify(printStream).println("Book Title");
     }
 
     @Test
     public void shouldPrintNothingWhenThereAreNoBooks() {
 
-        // implement me
+        library.listBooks();
+
+        verify(printStream, never()).println();
+
     }
 
     @Test
     public void shouldPrintBothBookTitlesWhenThereAreTwoBooks() {
 
-        // implement me
+        String title1 = "Book One";
+        String title2 = "Book Two";
+        books.add(title1);
+        books.add(title2);
+
+        library.listBooks();
+
+        verify(printStream).println("Book One");
+        verify(printStream).println("Book Two");
+
     }
 
-    /*
 
-        Welcome message tests. Implement these tests for the when/thenReturn exercise
-
-     */
-
-    
-    // This one is done for you
     @Test
     public void shouldWelcomeUser() {
-        List<String> books = new ArrayList<>();
-        PrintStream printStream = mock(PrintStream.class);
-        DateTimeFormatter dateTimeFormatter = mock(DateTimeFormatter.class);
-        Library library = new Library(books, printStream, dateTimeFormatter);
 
-        // We don't need to mock DateTime because it is a value object
-        // We can't mock it because it is a final class
-        DateTime time = new DateTime();
-        
+        library = new Library(books, printStream, dateTimeFormatter);
+
         library.welcome(time);
-        
+
         verify(printStream).println(contains("Welcome"));
     }
-    
+
     @Test
     public void shouldDisplayFormattedTime() {
-        List<String> books = new ArrayList<>();
-        PrintStream printStream = mock(PrintStream.class);
-        DateTime time = new DateTime();
-        DateTimeFormatter dateTimeFormatter = mock(DateTimeFormatter.class);
 
         when(dateTimeFormatter.print(time)).thenReturn("FormattedTimeString");
 
-        Library library = new Library(books, printStream, dateTimeFormatter);
+        libraryWithDateTimeFormatter.welcome(time);
 
-        library.welcome(time);
-
-        // add a verify here
+        verify(printStream).println(contains("FormattedTimeString"));
     }
 
     @Test
     public void shouldDisplayFormattedTimeWhenItIsAnEmptyString() {
 
-        // implement me
+        when(dateTimeFormatter.print(time)).thenReturn("");
+
+        libraryWithDateTimeFormatter.welcome(time);
+
+        verify(printStream).println(contains(dateTimeFormatter.print(time)));
     }
 }
